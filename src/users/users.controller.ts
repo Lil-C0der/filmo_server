@@ -12,6 +12,12 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 
+enum MSG {
+  FIND_MSG = '查询成功',
+  CREATE_MSG = '成功创建用户',
+  UPDATE_MSG = '成功更新用户信息',
+  REMOVE_MSG = '成功删除用户'
+}
 @Controller('users')
 @ApiTags('用户')
 export class UsersController {
@@ -19,39 +25,69 @@ export class UsersController {
 
   @Get()
   @ApiOperation({ summary: '返回用户列表' })
-  findAll() {
-    return this.usersService.findAll();
+  async findAll() {
+    const data = await this.usersService.findAll();
+    return {
+      code: 200,
+      success: true,
+      message: MSG.FIND_MSG,
+      data
+    };
   }
 
   @Post()
   @ApiOperation({ summary: '创建用户' })
   async create(@Body() createUserDto: CreateUserDto) {
     const data = await this.usersService.create(createUserDto);
-    console.log(data);
-
     return {
       code: 200,
       success: true,
-      message: '成功创建用户',
+      message: MSG.CREATE_MSG,
       data
     };
   }
 
   @Get(':id')
   @ApiOperation({ summary: '根据 id 返回用户信息' })
-  findOne(@Param('id') id: string) {
-    return this.usersService.findOne(+id);
+  async findOne(@Param('id') id: string) {
+    const data = this.usersService.find(id);
+    return {
+      code: 200,
+      success: true,
+      message: MSG.FIND_MSG,
+      data
+    };
   }
 
   @Put(':id')
   @ApiOperation({ summary: '编辑用户信息' })
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.update(+id, updateUserDto);
+  async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
+    const data = await this.usersService.update(id, updateUserDto);
+    return {
+      code: 200,
+      success: true,
+      message: MSG.UPDATE_MSG,
+      data
+    };
   }
 
   @Delete(':id')
   @ApiOperation({ summary: '删除用户' })
-  remove(@Param('id') id: string) {
-    return this.usersService.remove(+id);
+  async remove(@Param('id') id: string) {
+    const data = await this.usersService.remove(id);
+    return {
+      code: 200,
+      success: true,
+      message: MSG.REMOVE_MSG,
+      data
+    };
+  }
+
+  @Delete()
+  @ApiOperation({ summary: '删除所有用户' })
+  async removeAll() {
+    const res = await this.usersService.removeAll();
+    // res.map((i) => i.createdAt);
+    console.log(res);
   }
 }
