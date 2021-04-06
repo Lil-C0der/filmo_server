@@ -3,7 +3,7 @@ import { ReturnModelType } from '@typegoose/typegoose';
 import { InjectModel } from 'nestjs-typegoose';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { User } from '../../libs/db/src/models/user.model';
+import { User } from '@libs/db/models/user.model';
 import { DocumentType } from '@typegoose/typegoose';
 
 export interface IData extends DocumentType<User> {
