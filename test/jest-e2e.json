@@ -12,6 +12,10 @@
   },
   "moduleNameMapper": {
     "@libs/db/(.*)": "<rootDir>/../libs/db/src/$1",
-    "@libs/db": "<rootDir>/../libs/db/src"
+    "@libs/db": "<rootDir>/../libs/db/src",
+    "@app/common/(.*)": "<rootDir>/../libs/common/src/$1",
+    "@app/common": "<rootDir>/../libs/common/src",
+    "@libs/common/(.*)": "<rootDir>/../libs/common/src/$1",
+    "@libs/common": "<rootDir>/../libs/common/src"
   }
 }

@@ -11,12 +11,19 @@ const models = TypegooseModule.forFeature([User, Post]);
 @Global()
 @Module({
   imports: [
-    // 连接数据库
-    TypegooseModule.forRoot('mongodb://localhost:27017/filmo', {
-      useNewUrlParser: true,
-      useCreateIndex: true,
-      useUnifiedTopology: true,
-      useFindAndModify: false
+    // 注意：nest 中的模块是并行加载的，这里如果用 forFeature 加载，使用全局变量可能会读取不到
+    // 异步加载数据库模块，连接数据库，才能使用环境变量
+    TypegooseModule.forRootAsync({
+      // 在 configModule 加载完成后才会执行 useFactory 方法
+      useFactory() {
+        return {
+          uri: process.env.DB,
+          useNewUrlParser: true,
+          useCreateIndex: true,
+          useUnifiedTopology: true,
+          useFindAndModify: false
+        };
+      }
     }),
     models
   ],

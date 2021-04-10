@@ -25,9 +25,10 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api-docs', app, document);
 
-  await app.listen(5000);
+  const PORT = process.env.PORT || 5000;
+  await app.listen(PORT);
   console.log(
-    '成功启动，访问 http://localhost:5000/api-docs 查看接口文档！💫💫'
+    `成功启动，访问 http://localhost:${PORT}/api-docs 查看接口文档！💫💫`
   );
 }
 bootstrap();

@@ -19,7 +19,6 @@ export class LocalStrategy extends PassportStrategy(Strategy, 'local') {
   }
 
   async validate(username: string, password: string): Promise<any> {
-    console.log(123);
     // 查找用户
     const user = await this.userModel.findOne({ username }).select('+pwd');
 
@@ -30,8 +29,6 @@ export class LocalStrategy extends PassportStrategy(Strategy, 'local') {
     if (!compareSync(password, user.pwd)) {
       throw new UnauthorizedException('密码错误！');
     }
-
-    console.log('success');
 
     return user;
   }
