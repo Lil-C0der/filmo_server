@@ -24,7 +24,7 @@ export class UsersService {
   }
 
   async findAll() {
-    return (await this.userModel.find()) as IData[];
+    return (await this.userModel.find().select('+pwd')) as IData[];
   }
 
   async find(id: string) {
