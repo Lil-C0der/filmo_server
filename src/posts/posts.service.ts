@@ -4,6 +4,12 @@ import { InjectModel } from 'nestjs-typegoose';
 import { ReturnModelType } from '@typegoose/typegoose';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
+import { DocumentType } from '@typegoose/typegoose';
+
+export interface IData extends DocumentType<Post> {
+  createdAt?: Date;
+  updatedAt?: Date;
+}
 
 @Injectable()
 export class PostsService {
@@ -12,23 +18,32 @@ export class PostsService {
     private readonly postModel: ReturnModelType<typeof Post>
   ) {}
 
-  create(createPostDto: CreatePostDto) {
-    return 'This action adds a new post';
+  async create(createPostDto: CreatePostDto) {
+    const createdUser = new this.postModel(createPostDto);
+    return (await createdUser.save()) as IData;
   }
 
-  findAll() {
-    return `This action returns all posts`;
+  async findAll() {
+    return (await this.postModel.find()) as IData[];
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} post`;
+  async find(id: string) {
+    return (await this.postModel.findById(id)) as IData;
   }
 
-  update(id: number, updatePostDto: UpdatePostDto) {
-    return `This action updates a #${id} post`;
+  async update(id: string, updatePostDto: UpdatePostDto) {
+    await this.postModel.findOneAndUpdate({ _id: id }, updatePostDto);
+    return (await this.postModel.findOne({ _id: id }).exec()) as IData;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} post`;
+  async remove(id: string) {
+    await this.postModel.findOneAndDelete({ _id: id });
+    const data = await this.postModel.find();
+    return data as IData[];
+  }
+
+  async removeAll() {
+    await this.postModel.deleteMany((_id) => _id);
+    return (await this.postModel.find().exec()) as IData[];
   }
 }

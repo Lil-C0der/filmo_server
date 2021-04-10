@@ -12,7 +12,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 
-enum MSG {
+enum USERMSG {
   FIND_MSG = '查询成功',
   CREATE_MSG = '成功创建用户',
   UPDATE_MSG = '成功更新用户信息',
@@ -30,7 +30,7 @@ export class UsersController {
     return {
       code: 200,
       success: true,
-      message: MSG.FIND_MSG,
+      message: USERMSG.FIND_MSG,
       data
     };
   }
@@ -42,7 +42,7 @@ export class UsersController {
     return {
       code: 200,
       success: true,
-      message: MSG.CREATE_MSG,
+      message: USERMSG.CREATE_MSG,
       data
     };
   }
@@ -54,7 +54,7 @@ export class UsersController {
     return {
       code: 200,
       success: true,
-      message: MSG.FIND_MSG,
+      message: USERMSG.FIND_MSG,
       data
     };
   }
@@ -66,7 +66,7 @@ export class UsersController {
     return {
       code: 200,
       success: true,
-      message: MSG.UPDATE_MSG,
+      message: USERMSG.UPDATE_MSG,
       data
     };
   }
@@ -78,7 +78,7 @@ export class UsersController {
     return {
       code: 200,
       success: true,
-      message: MSG.REMOVE_MSG,
+      message: USERMSG.REMOVE_MSG,
       data
     };
   }
