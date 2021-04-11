@@ -1,19 +1,30 @@
-import { ExtractJwt, Strategy } from 'passport-jwt';
+import { ExtractJwt, Strategy, StrategyOptions } from 'passport-jwt';
 import { PassportStrategy } from '@nestjs/passport';
 import { Injectable } from '@nestjs/common';
-import { jwtConstants } from './constants';
+import { User } from '@libs/db/models/user.model';
+import { ReturnModelType } from '@typegoose/typegoose';
+import { InjectModel } from 'nestjs-typegoose';
 
 @Injectable()
-export class JwtStrategy extends PassportStrategy(Strategy) {
-  constructor() {
+export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
+  constructor(
+    @InjectModel(User)
+    private userModel: ReturnModelType<typeof User>
+  ) {
     super({
+      // 从请求头中取出 token
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-      ignoreExpiration: false,
-      secretOrKey: jwtConstants.secret
-    });
+      // 用于还原 jwt
+      secretOrKey: process.env.SECRET,
+      ignoreExpiration: true
+    } as StrategyOptions);
   }
 
-  async validate(payload: any) {
-    return { userId: payload.sub, username: payload.username };
+  async validate({ id }) {
+    console.log(`查询 id 为 ${id} 的用户信息`);
+    const user = this.userModel.findById(id);
+    console.log(user);
+
+    return user;
   }
 }

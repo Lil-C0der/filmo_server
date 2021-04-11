@@ -21,6 +21,7 @@ async function bootstrap() {
   const config = new DocumentBuilder()
     .setTitle('filmo API')
     .setDescription('filmo 的 API')
+    .addBearerAuth()
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api-docs', app, document);
