@@ -9,8 +9,10 @@ import { User } from '@libs/db/models/user.model';
 import { DocumentType } from '@typegoose/typegoose';
 
 enum AUTHMSG {
-  REGISTER_MSG = '注册成功',
-  LOGIN_MSG = '登录成功',
+  REGISTER_SUCCESS = '注册成功',
+  REGISTER_FAILED = '注册失败',
+  LOGIN_SUCCESS = '登录成功',
+  LOGIN_FAILED = '登录失败',
   DETAIL_MSG = '成功获取用户信息'
 }
 
@@ -33,23 +35,40 @@ export class AuthController {
   // 这个 guard 运行在接口的请求之前，只要发起请求，就会经过这个守卫
   @UseGuards(AuthGuard('local'))
   async login(@Body() loginDto: LoginDto, @Req() req) {
-    const { user }: { user: DocumentType<User> } = req;
-    console.log('用户登录', user);
-    console.log('用户id', user._id);
-    const token = this.jwtService.sign({ id: user._id });
-    console.log('用户token', token);
+    const {
+      user: temp
+    }: { user: DocumentType<User> | { errorMsg: string } } = req;
 
-    // 需要返回一个 token 给前端
-    return {
-      code: 200,
-      success: true,
-      msg: AUTHMSG.LOGIN_MSG,
-      data: {
-        user,
-        // 根据用户名和 mongo 提供的 id 生成 token
-        token
-      }
-    };
+    const err = temp as { errorMsg: string };
+    let data;
+    let token = null;
+    if (err.errorMsg) {
+      // data =
+      return {
+        code: 401,
+        success: false,
+        msg: AUTHMSG.LOGIN_FAILED,
+        data: {
+          error: err.errorMsg
+        }
+      };
+    } else {
+      const user = temp as DocumentType<User>;
+      console.log('用户id', user._id);
+      const token = this.jwtService.sign({ id: user._id });
+      console.log('用户token', token);
+      // 需要返回一个 token 给前端
+      return {
+        code: 200,
+        success: true,
+        msg: AUTHMSG.LOGIN_SUCCESS,
+        data: {
+          user,
+          // 根据用户名和 mongo 提供的 id 生成 token
+          token
+        }
+      };
+    }
   }
 
   @Get('user')

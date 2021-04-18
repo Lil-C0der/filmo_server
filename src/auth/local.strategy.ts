@@ -23,11 +23,13 @@ export class LocalStrategy extends PassportStrategy(Strategy, 'local') {
     const user = await this.userModel.findOne({ username }).select('+pwd');
 
     if (!user) {
-      throw new UnauthorizedException('用户名不存在！');
+      // throw new UnauthorizedException('用户名不存在！');
+      return { errorMsg: '用户名不存在！' };
     }
 
     if (!compareSync(password, user.pwd)) {
-      throw new UnauthorizedException('密码错误！');
+      // throw new UnauthorizedException('密码错误！');
+      return { errorMsg: '密码错误！' };
     }
 
     return user;
