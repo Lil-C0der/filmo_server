@@ -5,7 +5,6 @@ import { AuthService } from './auth.service';
 import { JwtService } from '@nestjs/jwt';
 import { RegisterDto } from './dto/create-auth.dto';
 import { LoginDto } from './dto/login-auth.dto';
-import { CurrentUser } from './current-user.decorator';
 import { User } from '@libs/db/models/user.model';
 import { DocumentType } from '@typegoose/typegoose';
 
@@ -33,10 +32,8 @@ export class AuthController {
   @ApiOperation({ summary: '用户登录' })
   // 这个 guard 运行在接口的请求之前，只要发起请求，就会经过这个守卫
   @UseGuards(AuthGuard('local'))
-  async login(
-    @Body() loginDto: LoginDto,
-    @CurrentUser() user: DocumentType<User>
-  ) {
+  async login(@Body() loginDto: LoginDto, @Req() req) {
+    const { user }: { user: DocumentType<User> } = req;
     console.log('用户登录', user);
     console.log('用户id', user._id);
     const token = this.jwtService.sign({ id: user._id });
@@ -60,7 +57,9 @@ export class AuthController {
   @UseGuards(AuthGuard('jwt'))
   // swagger 装饰器，表示可以添加头部字段
   @ApiBearerAuth()
-  async userDetail(@CurrentUser() user: DocumentType<User>) {
+  async userDetail(@Req() req) {
+    const { user }: { user: DocumentType<User> } = req;
+
     return {
       code: 200,
       success: true,
