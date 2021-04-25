@@ -5,12 +5,17 @@ import {
   Body,
   Param,
   Delete,
-  Put
+  Put,
+  UseGuards,
+  Req
 } from '@nestjs/common';
 import { PostsService } from './posts.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { AuthGuard } from '@nestjs/passport';
+import { DocumentType } from '@typegoose/typegoose';
+import { User } from '@libs/db/models/user.model';
 
 enum POSTMSG {
   FIND_MSG = '查询成功',
@@ -24,10 +29,21 @@ enum POSTMSG {
 export class PostsController {
   constructor(private readonly postsService: PostsService) {}
 
+  // TODO token
   @Post()
   @ApiOperation({ summary: '创建帖子' })
-  create(@Body() createPostDto: CreatePostDto) {
-    const data = this.postsService.create(createPostDto);
+  @UseGuards(AuthGuard('jwt'))
+  @ApiBearerAuth()
+  async create(@Body() createPostDto: CreatePostDto, @Req() req) {
+    // 根据 token 查询用户，创建时带上 username userId
+    const { user }: { user: DocumentType<User> } = req;
+
+    const data = await this.postsService.create({
+      ...createPostDto,
+      creatorId: user._id,
+      creatorUsername: user.username
+    });
+
     return {
       code: 200,
       success: true,
@@ -38,8 +54,10 @@ export class PostsController {
 
   @Get()
   @ApiOperation({ summary: '返回所有的帖子' })
-  findAll() {
-    const data = this.postsService.findAll();
+  async findAll() {
+    const data = await this.postsService.findAll();
+    console.log(data);
+
     return {
       code: 200,
       success: true,
@@ -50,8 +68,8 @@ export class PostsController {
 
   @Get(':id')
   @ApiOperation({ summary: '返回指定帖子' })
-  find(@Param('id') id: string) {
-    const data = this.postsService.find(id);
+  async find(@Param('id') id: string) {
+    const data = await this.postsService.find(id);
     return {
       code: 200,
       success: true,
@@ -62,8 +80,8 @@ export class PostsController {
 
   @Put(':id')
   @ApiOperation({ summary: '编辑帖子' })
-  update(@Param('id') id: string, @Body() updatePostDto: UpdatePostDto) {
-    const data = this.postsService.update(id, updatePostDto);
+  async update(@Param('id') id: string, @Body() updatePostDto: UpdatePostDto) {
+    const data = await this.postsService.update(id, updatePostDto);
     return {
       code: 200,
       success: true,
@@ -74,8 +92,20 @@ export class PostsController {
 
   @Delete(':id')
   @ApiOperation({ summary: '删除帖子' })
-  remove(@Param('id') id: string) {
-    const data = this.postsService.remove(id);
+  async remove(@Param('id') id: string) {
+    const data = await this.postsService.remove(id);
+    return {
+      code: 200,
+      success: true,
+      message: POSTMSG.REMOVE_MSG,
+      data
+    };
+  }
+
+  @Delete()
+  @ApiOperation({ summary: '删除所有帖子' })
+  async removeAll() {
+    const data = await this.postsService.removeAll();
     return {
       code: 200,
       success: true,

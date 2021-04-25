@@ -18,13 +18,44 @@ export class PostsService {
     private readonly postModel: ReturnModelType<typeof Post>
   ) {}
 
-  async create(createPostDto: CreatePostDto) {
+  async create(
+    createPostDto: CreatePostDto & {
+      creatorUsername: string;
+      creatorId: string;
+    }
+  ) {
+    console.log(createPostDto);
+
     const createdUser = new this.postModel(createPostDto);
     return (await createdUser.save()) as IData;
   }
 
   async findAll() {
-    return (await this.postModel.find()) as IData[];
+    const posts = (await this.postModel.find()) as IData[];
+    return {
+      posts: posts.map(
+        ({
+          title,
+          _id,
+          content,
+          creatorId,
+          creatorUsername,
+          createdAt,
+          updatedAt,
+          replies
+        }) => ({
+          title,
+          id: _id,
+          content,
+          creatorId,
+          creatorUsername,
+          createdAt,
+          updatedAt,
+          replies: replies.length
+        })
+      ),
+      total: posts.length
+    };
   }
 
   async find(id: string) {
@@ -43,7 +74,7 @@ export class PostsService {
   }
 
   async removeAll() {
-    await this.postModel.deleteMany((_id) => _id);
+    await this.postModel.deleteMany((userId) => !userId);
     return (await this.postModel.find().exec()) as IData[];
   }
 }

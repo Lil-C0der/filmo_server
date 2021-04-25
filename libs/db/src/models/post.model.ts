@@ -14,6 +14,12 @@ export class Post {
   @prop()
   public title: string;
   @prop()
+  public id: string;
+  @prop()
+  public creatorId: string;
+  @prop()
+  public creatorUsername: string;
+  @prop()
   public content: string;
   @prop()
   public replies: IReplies[];
