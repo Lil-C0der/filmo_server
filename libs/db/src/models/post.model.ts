@@ -1,8 +1,10 @@
 import { ModelOptions, prop } from '@typegoose/typegoose';
 
 // 回复楼层 需要有用户 id 和回复内容
-interface IReplies {
+interface IReply {
   userId: string;
+  username: string;
+  replyAt: string;
   content: string;
 }
 
@@ -22,5 +24,5 @@ export class Post {
   @prop()
   public content: string;
   @prop()
-  public replies: IReplies[];
+  public replies: IReply[];
 }

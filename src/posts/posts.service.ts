@@ -5,6 +5,7 @@ import { ReturnModelType } from '@typegoose/typegoose';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { DocumentType } from '@typegoose/typegoose';
+import { ReplyPostDto } from './dto/reply-post.dto';
 
 export interface IData extends DocumentType<Post> {
   createdAt?: Date;
@@ -64,6 +65,23 @@ export class PostsService {
 
   async update(id: string, updatePostDto: UpdatePostDto) {
     await this.postModel.findOneAndUpdate({ _id: id }, updatePostDto);
+    return (await this.postModel.findOne({ _id: id }).exec()) as IData;
+  }
+
+  /**
+   * @param {string} id 被回复帖子的 id
+   * @param {ReplyPostDto} replyPostDto
+   * @return {*}
+   * @memberof PostsService
+   */
+  async reply(
+    id: string,
+    replyPostDto: ReplyPostDto & { username: string; userId: string }
+  ) {
+    const postToUpdated = await this.postModel.findById(id);
+    postToUpdated.replies.push(replyPostDto);
+    await this.postModel.findOneAndUpdate({ _id: id }, postToUpdated);
+
     return (await this.postModel.findOne({ _id: id }).exec()) as IData;
   }
 

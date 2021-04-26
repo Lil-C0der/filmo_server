@@ -16,6 +16,7 @@ import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { DocumentType } from '@typegoose/typegoose';
 import { User } from '@libs/db/models/user.model';
+import { ReplyPostDto } from './dto/reply-post.dto';
 
 enum POSTMSG {
   FIND_MSG = '查询成功',
@@ -52,6 +53,29 @@ export class PostsController {
     };
   }
 
+  @Put(':id')
+  @ApiOperation({ summary: '回复帖子' })
+  @UseGuards(AuthGuard('jwt'))
+  @ApiBearerAuth()
+  async reply(
+    @Param('id') id: string,
+    @Body() replyPostDto: ReplyPostDto,
+    @Req() req
+  ) {
+    const { user }: { user: DocumentType<User> } = req;
+    const data = await this.postsService.reply(id, {
+      ...replyPostDto,
+      username: user.username,
+      userId: user.id
+    });
+    return {
+      code: 200,
+      success: true,
+      message: POSTMSG.UPDATE_MSG,
+      data
+    };
+  }
+
   @Get()
   @ApiOperation({ summary: '返回所有的帖子' })
   async findAll() {
@@ -78,17 +102,17 @@ export class PostsController {
     };
   }
 
-  @Put(':id')
-  @ApiOperation({ summary: '编辑帖子' })
-  async update(@Param('id') id: string, @Body() updatePostDto: UpdatePostDto) {
-    const data = await this.postsService.update(id, updatePostDto);
-    return {
-      code: 200,
-      success: true,
-      message: POSTMSG.UPDATE_MSG,
-      data
-    };
-  }
+  // @Put(':id')
+  // @ApiOperation({ summary: '编辑帖子' })
+  // async update(@Param('id') id: string, @Body() updatePostDto: UpdatePostDto) {
+  //   const data = await this.postsService.update(id, updatePostDto);
+  //   return {
+  //     code: 200,
+  //     success: true,
+  //     message: POSTMSG.UPDATE_MSG,
+  //     data
+  //   };
+  // }
 
   @Delete(':id')
   @ApiOperation({ summary: '删除帖子' })
