@@ -19,6 +19,11 @@ export class AuthService {
 
   async register(registerDto: RegisterDto) {
     const { username, password } = registerDto;
+    const duplicateUser = await this.userModel.findOne({ username });
+    if (duplicateUser) {
+      console.log(duplicateUser);
+      return { errorMsg: '用户名已被占用！' };
+    }
     const createdUser = new this.userModel({ username, pwd: password });
     return (await createdUser.save()) as IData;
   }

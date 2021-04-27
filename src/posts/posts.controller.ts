@@ -22,6 +22,7 @@ enum POSTMSG {
   FIND_MSG = '查询成功',
   CREATE_MSG = '成功发表帖子',
   UPDATE_MSG = '成功编辑帖子',
+  REPLY_MSG = '回帖成功',
   REMOVE_MSG = '成功删除帖子'
 }
 
@@ -48,7 +49,7 @@ export class PostsController {
     return {
       code: 200,
       success: true,
-      message: POSTMSG.CREATE_MSG,
+      msg: POSTMSG.CREATE_MSG,
       data
     };
   }
@@ -71,7 +72,7 @@ export class PostsController {
     return {
       code: 200,
       success: true,
-      message: POSTMSG.UPDATE_MSG,
+      msg: POSTMSG.REPLY_MSG,
       data
     };
   }
@@ -85,7 +86,7 @@ export class PostsController {
     return {
       code: 200,
       success: true,
-      message: POSTMSG.FIND_MSG,
+      msg: POSTMSG.FIND_MSG,
       data
     };
   }
@@ -97,7 +98,7 @@ export class PostsController {
     return {
       code: 200,
       success: true,
-      message: POSTMSG.FIND_MSG,
+      msg: POSTMSG.FIND_MSG,
       data
     };
   }
@@ -109,7 +110,7 @@ export class PostsController {
   //   return {
   //     code: 200,
   //     success: true,
-  //     message: POSTMSG.UPDATE_MSG,
+  //     msg: POSTMSG.UPDATE_MSG,
   //     data
   //   };
   // }
@@ -121,7 +122,7 @@ export class PostsController {
     return {
       code: 200,
       success: true,
-      message: POSTMSG.REMOVE_MSG,
+      msg: POSTMSG.REMOVE_MSG,
       data
     };
   }
@@ -133,7 +134,7 @@ export class PostsController {
     return {
       code: 200,
       success: true,
-      message: POSTMSG.REMOVE_MSG,
+      msg: POSTMSG.REMOVE_MSG,
       data
     };
   }

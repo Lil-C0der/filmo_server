@@ -16,6 +16,9 @@ enum AUTHMSG {
   DETAIL_MSG = '成功获取用户信息'
 }
 
+interface IError {
+  errorMsg: string;
+}
 @Controller('auth')
 @ApiTags('权限')
 export class AuthController {
@@ -27,7 +30,24 @@ export class AuthController {
   @Post('register')
   @ApiOperation({ summary: '用户注册' })
   async register(@Body() registerDto: RegisterDto) {
-    return this.authService.register(registerDto);
+    const data = await this.authService.register(registerDto);
+    const tmp = data as IError;
+    if (tmp.errorMsg) {
+      return {
+        code: 500,
+        success: false,
+        msg: AUTHMSG.REGISTER_FAILED,
+        data: {
+          error: tmp.errorMsg
+        }
+      };
+    }
+    return {
+      code: 200,
+      success: true,
+      msg: AUTHMSG.REGISTER_SUCCESS,
+      data
+    };
   }
 
   @Post('login')
@@ -35,13 +55,9 @@ export class AuthController {
   // 这个 guard 运行在接口的请求之前，只要发起请求，就会经过这个守卫
   @UseGuards(AuthGuard('local'))
   async login(@Body() loginDto: LoginDto, @Req() req) {
-    const {
-      user: temp
-    }: { user: DocumentType<User> | { errorMsg: string } } = req;
+    const { user: temp }: { user: DocumentType<User> | IError } = req;
 
-    const err = temp as { errorMsg: string };
-    let data;
-    let token = null;
+    const err = temp as IError;
     if (err.errorMsg) {
       // data =
       return {
