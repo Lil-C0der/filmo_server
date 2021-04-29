@@ -1,12 +1,13 @@
 import { Controller, Get, Post, Body, UseGuards, Req } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { AuthService } from './auth.service';
+import { AuthService, IData } from './auth.service';
 import { JwtService } from '@nestjs/jwt';
 import { RegisterDto } from './dto/create-auth.dto';
 import { LoginDto } from './dto/login-auth.dto';
 import { User } from '@libs/db/models/user.model';
 import { DocumentType } from '@typegoose/typegoose';
+import { PostsService } from 'src/posts/posts.service';
 
 enum AUTHMSG {
   REGISTER_SUCCESS = '注册成功',
@@ -24,7 +25,8 @@ interface IError {
 export class AuthController {
   constructor(
     private readonly authService: AuthService,
-    private jwtService: JwtService
+    private jwtService: JwtService,
+    private readonly postsService: PostsService
   ) {}
 
   @Post('register')
@@ -93,14 +95,19 @@ export class AuthController {
   // swagger 装饰器，表示可以添加头部字段
   @ApiBearerAuth()
   async userDetail(@Req() req) {
-    const { user }: { user: DocumentType<User> } = req;
+    let { user }: { user: DocumentType<User> } = req;
+
+    const tmp: IData = JSON.parse(JSON.stringify(user));
+    // @ts-ignore
+    tmp.posts = await this.postsService.findAllPostsByCreatorId(user.id);
 
     return {
       code: 200,
       success: true,
       msg: AUTHMSG.DETAIL_MSG,
       data: {
-        user
+        // user
+        user: tmp
       }
     };
   }

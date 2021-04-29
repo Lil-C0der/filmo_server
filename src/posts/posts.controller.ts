@@ -11,7 +11,6 @@ import {
 } from '@nestjs/common';
 import { PostsService } from './posts.service';
 import { CreatePostDto } from './dto/create-post.dto';
-import { UpdatePostDto } from './dto/update-post.dto';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { DocumentType } from '@typegoose/typegoose';
@@ -81,7 +80,6 @@ export class PostsController {
   @ApiOperation({ summary: '返回所有的帖子' })
   async findAll() {
     const data = await this.postsService.findAll();
-    console.log(data);
 
     return {
       code: 200,

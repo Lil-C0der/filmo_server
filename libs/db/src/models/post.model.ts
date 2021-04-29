@@ -1,7 +1,7 @@
 import { ModelOptions, prop } from '@typegoose/typegoose';
 
 // 回复楼层 需要有用户 id 和回复内容
-interface IReply {
+export interface IReply {
   userId: string;
   username: string;
   replyAt: string;

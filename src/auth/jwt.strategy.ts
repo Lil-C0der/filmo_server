@@ -23,8 +23,6 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   async validate({ id }) {
     console.log(`查询 id 为 ${id} 的用户信息`);
     const user = this.userModel.findById(id);
-    console.log(user);
-
     return user;
   }
 }

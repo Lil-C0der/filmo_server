@@ -25,10 +25,10 @@ export class PostsService {
       creatorId: string;
     }
   ) {
-    console.log(createPostDto);
-
-    const createdUser = new this.postModel(createPostDto);
-    return (await createdUser.save()) as IData;
+    const createdPost = new this.postModel(createPostDto);
+    const newPost = await createdPost.save();
+    newPost.id = newPost._id;
+    return newPost as IData;
   }
 
   async findAll() {
@@ -52,7 +52,8 @@ export class PostsService {
           creatorUsername,
           createdAt,
           updatedAt,
-          replies: replies.length
+          replies,
+          repliesNum: replies.length
         })
       ),
       total: posts.length
@@ -60,7 +61,36 @@ export class PostsService {
   }
 
   async find(id: string) {
-    return (await this.postModel.findById(id)) as IData;
+    const tagretPost = await this.postModel.findById(id);
+    return { ...tagretPost, id: tagretPost._id } as IData;
+  }
+
+  async findAllPostsByCreatorId(creatorId: string) {
+    const posts = (await (await this.postModel.find()).filter(
+      (post) => post.creatorId === creatorId
+    )) as IData[];
+
+    return posts.map(
+      ({
+        title,
+        _id,
+        content,
+        creatorId,
+        creatorUsername,
+        createdAt,
+        updatedAt,
+        replies
+      }) => ({
+        title,
+        id: _id,
+        content,
+        creatorId,
+        creatorUsername,
+        createdAt,
+        updatedAt,
+        repliesNum: replies.length
+      })
+    );
   }
 
   async update(id: string, updatePostDto: UpdatePostDto) {
