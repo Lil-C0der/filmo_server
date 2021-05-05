@@ -1,12 +1,8 @@
 import { ModelOptions, prop, Ref } from '@typegoose/typegoose';
 import { hashSync } from 'bcryptjs';
+import { Movie } from './movie.model';
 import { Post } from './post.model';
 
-interface IMovie {
-  id: number | string;
-  name: string;
-  imgUrl: string;
-}
 @ModelOptions({
   schemaOptions: { timestamps: true }
 })
@@ -27,8 +23,8 @@ export class User {
   public pwd: string;
   @prop({ ref: 'Post' })
   public posts: Ref<Post>[];
-  @prop()
-  public watchedList: IMovie[];
-  @prop()
-  public favoritesList: IMovie[];
+  @prop({ ref: 'Movie' })
+  public watchedList: Ref<Movie>[];
+  @prop({ ref: 'Movie' })
+  public collectionList: Ref<Movie>[];
 }

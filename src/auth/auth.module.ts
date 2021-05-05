@@ -5,11 +5,18 @@ import { PassportModule } from '@nestjs/passport';
 import { LocalStrategy } from './local.strategy';
 import { JwtStrategy } from './jwt.strategy';
 import { PostsService } from 'src/posts/posts.service';
+import { MoviesService } from 'src/movies/movies.service';
 
 @Module({
   imports: [PassportModule],
   controllers: [AuthController],
   // 注意：编写的策略需要导入并使用
-  providers: [AuthService, LocalStrategy, JwtStrategy, PostsService]
+  providers: [
+    AuthService,
+    LocalStrategy,
+    JwtStrategy,
+    PostsService,
+    MoviesService
+  ]
 })
 export class AuthModule {}

@@ -3,9 +3,10 @@ import { DbService } from './db.service';
 import { TypegooseModule } from 'nestjs-typegoose';
 import { User } from './models/user.model';
 import { Post } from './models/post.model';
+import { Movie } from './models/movie.model';
 
 // 注册模型
-const models = TypegooseModule.forFeature([User, Post]);
+const models = TypegooseModule.forFeature([User, Post, Movie]);
 
 // 标记 db 模块为全局的模块
 @Global()

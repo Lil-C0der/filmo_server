@@ -5,7 +5,7 @@ import { InjectModel } from 'nestjs-typegoose';
 import { RegisterDto } from './dto/create-auth.dto';
 import { DocumentType } from '@typegoose/typegoose';
 
-export interface IData extends DocumentType<User> {
+export interface IUserData extends DocumentType<User> {
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -25,6 +25,6 @@ export class AuthService {
       return { errorMsg: '用户名已被占用！' };
     }
     const createdUser = new this.userModel({ username, pwd: password });
-    return (await createdUser.save()) as IData;
+    return (await createdUser.save()) as IUserData;
   }
 }

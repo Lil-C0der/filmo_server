@@ -30,7 +30,6 @@ enum POSTMSG {
 export class PostsController {
   constructor(private readonly postsService: PostsService) {}
 
-  // TODO token
   @Post()
   @ApiOperation({ summary: '创建帖子' })
   @UseGuards(AuthGuard('jwt'))
@@ -100,18 +99,6 @@ export class PostsController {
       data
     };
   }
-
-  // @Put(':id')
-  // @ApiOperation({ summary: '编辑帖子' })
-  // async update(@Param('id') id: string, @Body() updatePostDto: UpdatePostDto) {
-  //   const data = await this.postsService.update(id, updatePostDto);
-  //   return {
-  //     code: 200,
-  //     success: true,
-  //     msg: POSTMSG.UPDATE_MSG,
-  //     data
-  //   };
-  // }
 
   @Delete(':id')
   @ApiOperation({ summary: '删除帖子' })

@@ -7,7 +7,4 @@ export class CreatePostDto {
   title: string;
   @ApiProperty({ description: '正文', example: '帖子的内容' })
   content: string;
-  // // 发帖人
-  // creatorId: string;
-  // creatorUsername: string;
 }

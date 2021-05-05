@@ -50,7 +50,7 @@ export class UsersController {
   @Get(':id')
   @ApiOperation({ summary: '根据 id 返回用户信息' })
   async findOne(@Param('id') id: string) {
-    const data = this.usersService.find(id);
+    const data = await this.usersService.find(id);
     return {
       code: 200,
       success: true,
