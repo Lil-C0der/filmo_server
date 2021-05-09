@@ -17,7 +17,8 @@ enum AUTHMSG {
   LOGIN_SUCCESS = '登录成功',
   LOGIN_FAILED = '登录失败',
   DETAIL_MSG = '成功获取用户信息',
-  MARK_MSG = '标记成功'
+  MARK_MSG = '标记成功',
+  REMOVE_MSG = '已从列表移除'
 }
 
 interface IError {
@@ -63,7 +64,7 @@ export class AuthController {
     //  console.log('original list', user.collectionList);
     const promiseArr = user.collectionList.map(
       // @ts-ignore
-      async (_id) => await this.movieService.findOne(_id)
+      async (_id) => await this.movieService.findOneByMongoId(_id)
     );
     tmp.collectionList = await (await Promise.all(promiseArr)).filter((m) => m);
     // TODO watchedList
@@ -128,17 +129,25 @@ export class AuthController {
     };
   }
 
-  @Post('addToCollection')
+  @Post('addToList')
   @ApiOperation({ summary: '收藏电影' })
   @UseGuards(AuthGuard('jwt'))
   @ApiBearerAuth()
-  async addToFavortieList(@Body() movieDto: CreateMovieDto, @Req() req) {
+  async addToList(@Body() movieDto: CreateMovieDto, @Req() req) {
     const { user }: { user: DocumentType<User> } = req;
     const newMovie = await this.movieService.create(movieDto);
+    const { targetList } = movieDto;
+
     // push 的是电影 id，因为 RefType 默认是 id
-    if (newMovie && !user.collectionList.includes(newMovie._id)) {
-      user.collectionList.push(newMovie);
-      await user.save();
+    if (newMovie) {
+      if (targetList === 10 && !user.collectionList.includes(newMovie._id)) {
+        user.collectionList.push(newMovie);
+        await user.save();
+      }
+      if (targetList === 20 && !user.watchedList.includes(newMovie._id)) {
+        user.watchedList.push(newMovie);
+        await user.save();
+      }
     }
 
     return {
@@ -152,13 +161,48 @@ export class AuthController {
     };
   }
 
-  @Post('addToCollection')
-  @ApiOperation({ summary: '收藏电影' })
+  @Post('removeFromList')
+  @ApiOperation({ summary: '从收藏列表中移除电影' })
   @UseGuards(AuthGuard('jwt'))
   @ApiBearerAuth()
-  async removeFromFavortieList(@Body() movieDto: CreateMovieDto, @Req() req) {
+  async removeFromList(@Body() movieDto: CreateMovieDto, @Req() req) {
     const { user }: { user: DocumentType<User> } = req;
     // TODO remove
+    const { id } = movieDto.movie;
+    const { targetList } = movieDto;
+    const { collectionList, watchedList } = user;
+
+    const movieRes = await this.movieService.findOneByMovieId(id);
+    console.log('query movie', movieRes);
+
+    if (movieRes && movieRes._id) {
+      if (targetList === 10) {
+        const idx = collectionList.indexOf(movieRes._id);
+        console.log(idx, user.collectionList);
+        idx >= 0 && user.collectionList.splice(idx, 1);
+        await user.save();
+      }
+      if (targetList === 20) {
+        const idx = watchedList.indexOf(movieRes._id);
+        console.log(idx, user.watchedList);
+        idx >= 0 && user.watchedList.splice(idx, 1);
+        await user.save();
+      }
+    }
+
+    // if (collectionList.map((m) => m.id).includes(id)) {
+    //   console.log(111, 'includes');
+    // }
+
+    return {
+      code: 200,
+      success: true,
+      msg: AUTHMSG.REMOVE_MSG,
+      data: {
+        user
+        // user: tmp
+      }
+    };
   }
 
   // TODO watchedList

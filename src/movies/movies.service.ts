@@ -38,8 +38,15 @@ export class MoviesService {
     return await this.movieModel.find();
   }
 
-  async findOne(id: string) {
+  async findOneByMongoId(id: string) {
     const res = await this.movieModel.findById(id);
+    return res;
+  }
+
+  async findOneByMovieId(id: number) {
+    const res = await this.movieModel.findOne({ id });
+    // console.log(res);
+
     return res;
   }
 

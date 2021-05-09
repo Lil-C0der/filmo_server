@@ -22,8 +22,8 @@ export class MoviesController {
 
   @Get(':id')
   @ApiOperation({ summary: '查找电影' })
-  findOne(@Param('id') id: string) {
-    return this.moviesService.findOne(id);
+  findOneByMongoId(@Param('id') id: string) {
+    return this.moviesService.findOneByMongoId(id);
   }
 
   @Delete()
