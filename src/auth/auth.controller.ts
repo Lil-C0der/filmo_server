@@ -61,13 +61,18 @@ export class AuthController {
     const tmp: IUserData = JSON.parse(JSON.stringify(user));
     // @ts-ignore
     tmp.posts = await this.postsService.findAllPostsByCreatorId(user.id);
-    //  console.log('original list', user.collectionList);
+    // collectionList
     const promiseArr = user.collectionList.map(
       // @ts-ignore
       async (_id) => await this.movieService.findOneByMongoId(_id)
     );
+    // watchedList
+    const promiseArr2 = user.watchedList.map(
+      // @ts-ignore
+      async (_id) => await this.movieService.findOneByMongoId(_id)
+    );
     tmp.collectionList = await (await Promise.all(promiseArr)).filter((m) => m);
-    // TODO watchedList
+    tmp.watchedList = await (await Promise.all(promiseArr2)).filter((m) => m);
     return tmp;
   }
 
@@ -130,7 +135,7 @@ export class AuthController {
   }
 
   @Post('addToList')
-  @ApiOperation({ summary: '收藏电影' })
+  @ApiOperation({ summary: '收藏 / 看过电影' })
   @UseGuards(AuthGuard('jwt'))
   @ApiBearerAuth()
   async addToList(@Body() movieDto: CreateMovieDto, @Req() req) {
@@ -162,7 +167,7 @@ export class AuthController {
   }
 
   @Post('removeFromList')
-  @ApiOperation({ summary: '从收藏列表中移除电影' })
+  @ApiOperation({ summary: '从收藏 / 看过列表中移除电影' })
   @UseGuards(AuthGuard('jwt'))
   @ApiBearerAuth()
   async removeFromList(@Body() movieDto: CreateMovieDto, @Req() req) {
