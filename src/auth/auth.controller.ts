@@ -18,7 +18,7 @@ enum AUTHMSG {
   LOGIN_FAILED = '登录失败',
   DETAIL_MSG = '成功获取用户信息',
   MARK_MSG = '标记成功',
-  REMOVE_MSG = '已从列表移除'
+  REMOVE_MSG = '已从列表移除',
 }
 
 interface IError {
@@ -45,15 +45,15 @@ export class AuthController {
         success: false,
         msg: AUTHMSG.REGISTER_FAILED,
         data: {
-          error: tmp.errorMsg
-        }
+          error: tmp.errorMsg,
+        },
       };
     }
     return {
       code: 200,
       success: true,
       msg: AUTHMSG.REGISTER_SUCCESS,
-      data
+      data,
     };
   }
 
@@ -91,8 +91,8 @@ export class AuthController {
         success: false,
         msg: AUTHMSG.LOGIN_FAILED,
         data: {
-          error: err.errorMsg
-        }
+          error: err.errorMsg,
+        },
       };
     } else {
       const user = temp as DocumentType<User>;
@@ -108,8 +108,8 @@ export class AuthController {
         data: {
           user: tmp,
           // 根据用户名和 mongo 提供的 id 生成 token
-          token
-        }
+          token,
+        },
       };
     }
   }
@@ -129,8 +129,8 @@ export class AuthController {
       success: true,
       msg: AUTHMSG.DETAIL_MSG,
       data: {
-        user: tmp
-      }
+        user: tmp,
+      },
     };
   }
 
@@ -160,9 +160,9 @@ export class AuthController {
       success: true,
       msg: AUTHMSG.MARK_MSG,
       data: {
-        user
+        user,
         // user: tmp
-      }
+      },
     };
   }
 
@@ -172,7 +172,6 @@ export class AuthController {
   @ApiBearerAuth()
   async removeFromList(@Body() movieDto: CreateMovieDto, @Req() req) {
     const { user }: { user: DocumentType<User> } = req;
-    // TODO remove
     const { id } = movieDto.movie;
     const { targetList } = movieDto;
     const { collectionList, watchedList } = user;
@@ -204,11 +203,9 @@ export class AuthController {
       success: true,
       msg: AUTHMSG.REMOVE_MSG,
       data: {
-        user
+        user,
         // user: tmp
-      }
+      },
     };
   }
-
-  // TODO watchedList
 }
